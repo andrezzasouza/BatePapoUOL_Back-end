@@ -15,7 +15,7 @@ const participants = [];
 
 app.get("/participants", (req, res) => {
   res.send(participants);
-})
+});
 
 app.post("/participants", (req, res) => {
   const newUsername = req.body.name;
@@ -27,7 +27,7 @@ app.post("/participants", (req, res) => {
       lastStatus: Date.now()
     });
     res.status(200);
-    console.log('here 1')
+    // console.log('here 1')
   } else {
     res.status(400);
     // console.log('here2')
@@ -35,7 +35,33 @@ app.post("/participants", (req, res) => {
   res.send();
   // const participantsJSON = JSON.stringify(participants);
   // fs.writeFileSync("userData.json", participantsJSON);
-})
+});
+
+app.get("/messages", (req, res) => {
+  const username = req.headers.user;
+  const maxMessages = req.query.limit
+  const returnArray = [];
+
+  const filteredArray = messages.filter((msg) => {
+    if (msg.from === username || msg.to === username || msg.to === "Todos") {
+      return msg;
+    }
+  });
+
+  console.log(req.query.limit)
+
+  if (req.query.limit !== true) {
+    res.send(filteredArray);
+  } else {
+    for (let i = 0; i < maxMessages; i++) {
+      if (filteredArray[i]) {
+        returnArray.push(filteredArray[i]);
+      }
+    }
+    res.send(returnArray);
+  }
+  // test if it's working
+});
 
 app.post("/messages", (req, res) => {
 
@@ -54,6 +80,6 @@ app.post("/messages", (req, res) => {
     res.status(400);
   }
   res.send();
-})
+});
 
 app.listen(4000);
