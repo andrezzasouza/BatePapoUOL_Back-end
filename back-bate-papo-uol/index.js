@@ -21,7 +21,6 @@ function checkPresence() {
     const moreThan10 = Date.now() - participants[i].lastStatus > 10000;
     console.log("3", participants);
     if(moreThan10 /*&& participants === undefined*/) {
-      participants.splice(i, 1);
       messages.push({
         from: participants[i].name,
         to: "Todos",
@@ -29,6 +28,7 @@ function checkPresence() {
         type: "status",
         time: dayjs(Date.now()).format("HH:mm:ss"),
       });
+      participants.splice(i, 1);
       console.log("3", participants);
     }
   }
