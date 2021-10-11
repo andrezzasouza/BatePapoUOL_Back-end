@@ -20,12 +20,22 @@ app.get("/participants", (req, res) => {
 app.post("/participants", (req, res) => {
   const newUsername = req.body.name;
   const inUse = participants.find(e => e.name === newUsername);
+  const messageTime = Date.now();
 
   if (newUsername !== "" && inUse === undefined && newUsername !== null) {
     participants.push({
       name: newUsername,
-      lastStatus: Date.now()
+      lastStatus: messageTime
     });
+    messages.push(
+      {
+        from: newUsername, 
+        to: 'Todos', 
+        text: 'entra na sala...', 
+        type: 'status', 
+        time: dayjs(messageTime).format("HH:mm:ss")
+      }
+    );
     res.status(200);
     // console.log('here 1')
   } else {
@@ -48,8 +58,6 @@ app.get("/messages", (req, res) => {
     }
   });
 
-  console.log(req.query.limit)
-
   if (req.query.limit !== true) {
     res.send(filteredArray);
   } else {
@@ -64,14 +72,13 @@ app.get("/messages", (req, res) => {
 });
 
 app.post("/messages", (req, res) => {
-
   const messageData = req.body;
   const messageTime = Date.now();
   const username = req.headers.user;
   const userOnline = participants.find((e) => e.name === username);
   //can i send this username into the if?
 
-  if (messageData.to !== "" && messageData.text !== "" & (messageData.type === "message" || messageData.type === "private_message") && userOnline) {
+  if (messageData.to !== "" && messageData.text !== "" && (messageData.type === "message" || messageData.type === "private_message") && userOnline) {
     messageData.from = username;
     messageData.time = dayjs(messageTime).format("HH:mm:ss");
     messages.push(messageData);
@@ -81,5 +88,22 @@ app.post("/messages", (req, res) => {
   }
   res.send();
 });
+
+app.post("/status", (req, res) => {
+  const statusTime = Date.now();
+  const username = req.headers.user;
+  const foundUser = participants.find(e => e.name === username);
+  if (foundUser) {
+    for (let i = 0; i < participants.length; i++) {
+      if (foundUser.name === participants[i].name) {
+        participants[i].time = dayjs(statusTime).format("HH:mm:ss");
+      }
+    }
+    res.status(200);
+  } else {
+    res.status(400);
+  }
+  res.send();
+})
 
 app.listen(4000);
