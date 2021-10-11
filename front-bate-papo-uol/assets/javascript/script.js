@@ -14,7 +14,6 @@ function perguntarNome() {
 function registrarParticipante() {
   const dados = { name: nome };
   const requisicao = axios.post("http://localhost:4000/participants", dados);
-  console.log(requisicao)
   requisicao.then(entrarNaSala).catch(perguntarNome);
 }
 
