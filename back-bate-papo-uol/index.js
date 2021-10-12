@@ -3,24 +3,18 @@ import cors from 'cors';
 import dayjs from 'dayjs';
 import fs from 'fs';
 
-console.log("node loop")
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const messages = [];
 let participants = [];
-// const dataJSON = fs.readFileSync("userData.json");
-// const participants = JSON.parse(dataJSON);
-// console.log("here")
 
 function checkPresence() {
-  console.log("1", participants)
   for (let i = 0; i < participants.length; i++) {
     const moreThan10 = Date.now() - participants[i].lastStatus > 10000;
-    console.log("3", participants);
-    if(moreThan10 /*&& participants === undefined*/) {
+    if(moreThan10) {
+      participants.splice(i, 1);
       messages.push({
         from: participants[i].name,
         to: "Todos",
@@ -28,8 +22,6 @@ function checkPresence() {
         type: "status",
         time: dayjs(Date.now()).format("HH:mm:ss"),
       });
-      participants.splice(i, 1);
-      console.log("3", participants);
     }
   }
 }
@@ -64,8 +56,6 @@ app.post("/participants", (req, res) => {
     res.status(400);
   }
   res.send();
-  // const participantsJSON = JSON.stringify(participants);
-  // fs.writeFileSync("userData.json", participantsJSON);
 });
 
 app.get("/messages", (req, res) => {
@@ -111,11 +101,9 @@ app.post("/status", (req, res) => {
         participants[i].lastStatus = Date.now();
       }
     }
-    console.log("4", participants)
     res.status(200);
   } else {
     res.status(400);
-    console.log("5", participants);
   }
   res.send(foundUser);
 })
